@@ -14,7 +14,7 @@
   Web      :  http://www.tkjelectronics.com
   e-mail   :  kristianl@tkjelectronics.com
 
-  Modified by Brian Palmer aug, 2020 - added Grade filters
+  Modified by Brian Palmer aug, 2020 - added Moving Averaging filter and added Kalman filter on Grade.
 */
 
 #include <Wire.h>
@@ -28,7 +28,7 @@ MovingAverageFilter movingAverageFilter_y(9);        // Moving average filters f
 MovingAverageFilter movingAverageFilter_z(9);
 float moveAvgX, moveAvgY, moveAvgZ;
 
-#define RESTRICT_PITCH // Comment out to restrict roll to ±90deg instead - please read: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf
+#define RESTRICT_PITCH // Comment out to restrict roll to ±90deg - please read: http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf
 
 Kalman kalmanAngleX; // Create the Kalman instances
 Kalman kalmanAngleY;
@@ -194,29 +194,26 @@ void loop() {
   double mvgAvgGradeX = calcGrade(moveAvgX, moveAvgY, moveAvgZ);
 
   /* Print Data */
-#if 1 // Set to 1 to activate
-  //Serial.print("MvgAvgGradeX:"); Serial.print(mvgAvgGradeX); Serial.print("\t");
-  //  Serial.print("accY:"); Serial.print(accY); Serial.print("\t");
-  //  Serial.print("accZ:"); Serial.print(accZ); Serial.print("\t");
+#if 0 // Set to 1 to activate
+  Serial.print("accY:"); Serial.print(accY); Serial.print("\t");
+  Serial.print("accZ:"); Serial.print(accZ); Serial.print("\t");
 
-  // Serial.print("gyroX:"); Serial.print(gyroX); Serial.print("\t");
-  //  Serial.print("gyroY:"); Serial.print(gyroY); Serial.print("\t");
-  //  Serial.print("gyroZ:"); Serial.print(gyroZ); Serial.print("\t");
-
+  Serial.print("gyroX:"); Serial.print(gyroX); Serial.print("\t");
+  Serial.print("gyroY:"); Serial.print(gyroY); Serial.print("\t");
+  Serial.print("gyroZ:"); Serial.print(gyroZ); Serial.print("\t");
 #endif
-//  // Angle
-//  Serial.print("unFiltAngle:"); Serial.print(rollAngle); Serial.print("\t");
-//  //Serial.print("gyroXangle:");Serial.print(gyroXangle); Serial.print("\t");
-//  Serial.print("complAngle:"); Serial.print(compAngleX); Serial.print("\t");
-//  Serial.print("kalmanAngle:"); Serial.print(kalAngleX); Serial.print("\t");
-
+  //  Angles
+  //  Serial.print("unFiltAngle:"); Serial.print(rollAngle); Serial.print("\t");
+  //  Serial.print("gyroXangle:");Serial.print(gyroXangle); Serial.print("\t");
+  //  Serial.print("complAngle:"); Serial.print(compAngleX); Serial.print("\t");
+  //  Serial.print("kalmanAngle:"); Serial.print(kalAngleX); Serial.print("\t");
 
   //  Serial.print("pitch:"); Serial.print(pitch); Serial.print("\t");
-  //  //Serial.print("gyroYangle:");Serial.print(gyroYangle); Serial.print("\t");
+  //  Serial.print("gyroYangle:");Serial.print(gyroYangle); Serial.print("\t");
   //  Serial.print("compAngleY:"); Serial.print(compAngleY); Serial.print("\t");
   //  Serial.print("kalAngleY:"); Serial.print(kalAngleY); Serial.print("\t");
 
-  // Grade
+  // Grades
   Serial.print("unfiltered:"); Serial.print(rollGrade); Serial.print("\t");
   Serial.print("complementaryFilter:"); Serial.print(compGradeX); Serial.print("\t");
   Serial.print("kalmanFilter:"); Serial.print(kalGradeX); Serial.print("\t");
@@ -225,7 +222,6 @@ void loop() {
   Serial.print("\r\n");
   delay(2);
 }
-
 
 double calcGrade(float x, float y, float z) {
   double grade = 0;
@@ -236,7 +232,5 @@ double calcGrade(float x, float y, float z) {
   grade = tan(radpitch) * 100;
 
   //grade = grade * -1; // flip the sign since its mounted with the USB port on the left.
-
   return grade;
-
 }
